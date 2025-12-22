@@ -1,8 +1,8 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Breed } from '../interfaces';
-import { breedApi } from '../api/breedApi';
-import { CreateBreedRequest } from '../interfaces/request/breed';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { Breed } from "../interfaces";
+import { breedApi } from "../api/breedApi";
+import { CreateBreedRequest } from "../interfaces/request/breed";
+import { useNotification } from "./NotificationContext";
 
 interface BreedContextType {
   breeds: Breed[];
@@ -12,22 +12,40 @@ interface BreedContextType {
 
 const BreedContext = createContext<BreedContextType | undefined>(undefined);
 
-export const BreedProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const BreedProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { notify } = useNotification();
   const [breeds, setBreeds] = useState<Breed[]>([]);
 
+  const load = async () => setBreeds(await breedApi.getAll());
+
   useEffect(() => {
-    const load = async () => setBreeds(await breedApi.getAll());
     load();
   }, []);
 
   const addBreed = async (b: CreateBreedRequest) => {
     const res = await breedApi.create(b);
-    setBreeds(prev => [...prev, res]);
+    if (res === null) {
+      notify("error", "Thêm giống mới thất bại");
+    } else {
+      notify("success", "Thêm giống mới thành công");
+      load();
+    }
   };
 
   const deleteBreed = async (id: number | string) => {
-    await breedApi.delete(id);
-    setBreeds(prev => prev.filter(x => x.id !== id));
+    const res = await breedApi.delete(id);
+    if (res === 0) {
+      notify("error", "Đổi trạng thái thất bại");
+    } else if (res === 404) {
+      notify("error", "Không tìm thấy giống");
+    } else if (res === 500) {
+      notify("error", "Lỗi hệ thống");
+    } else if (res === 1) {
+      notify("success", "Đổi trạng thái thành công");
+      load();
+    }
   };
 
   return (
@@ -39,6 +57,6 @@ export const BreedProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 export const useBreed = () => {
   const context = useContext(BreedContext);
-  if (!context) throw new Error('useBreed must be used within BreedProvider');
+  if (!context) throw new Error("useBreed must be used within BreedProvider");
   return context;
 };

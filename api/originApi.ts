@@ -1,31 +1,27 @@
-
 import { INITIAL_ORIGINS } from "../constants";
 import { Origin } from "../interfaces/models";
 import { CreateOriginRequest } from "../interfaces/request/origin";
+import axiosClient from "./axiosClient";
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const originApi = {
   getAll: async (): Promise<Origin[]> => {
-    await delay(300);
-    return [...INITIAL_ORIGINS];
+    const res = await axiosClient.get("/origin/get-all");
+    return res.data;
   },
 
   create: async (data: CreateOriginRequest): Promise<Origin> => {
-    await delay(400);
-    const now = new Date().toISOString();
-    return { 
-        ...data, 
-        id: `o-${Date.now()}`,
-        createdAt: now,
-        createdBy: 'System',
-        updatedAt: now,
-        updatedBy: 'System'
-    };
+    const res = await axiosClient.post("/origin/create", data);
+    return res.data.data; // SuccessResponse<Breed>
   },
 
-  delete: async (id: number | string): Promise<boolean> => {
-    await delay(300);
-    return true;
-  }
+  delete: async (id: number | string): Promise<number> => {
+    const res = await axiosClient.post("/origin/update-status", null, {
+      params: {
+        id,
+      },
+    });
+    return res.data;
+  },
 };
