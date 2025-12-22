@@ -1,8 +1,11 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Category } from '../interfaces';
-import { categoryApi } from '../api/categoryApi';
-import { CreateCategoryRequest } from '../interfaces/request/category';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { Category } from "../interfaces";
+import { categoryApi } from "../api/categoryApi";
+import {
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+} from "../interfaces/request/category";
+import { useNotification } from "./NotificationContext";
 
 interface CategoryContextType {
   categories: Category[];
@@ -11,33 +14,64 @@ interface CategoryContextType {
   deleteCategory: (id: number | string) => Promise<void>;
 }
 
-const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
+const CategoryContext = createContext<CategoryContextType | undefined>(
+  undefined
+);
 
-export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { notify } = useNotification();
   const [categories, setCategories] = useState<Category[]>([]);
 
+  const load = async () => setCategories(await categoryApi.getAll());
+
   useEffect(() => {
-    const load = async () => setCategories(await categoryApi.getAll());
     load();
   }, []);
 
   const addCategory = async (c: CreateCategoryRequest) => {
     const res = await categoryApi.create(c);
-    setCategories(prev => [...prev, res]);
+    if (res === null) {
+      notify("error", "Thêm danh mục mới thất bại");
+    } else {
+      notify("success", "Thêm danh mục mới thành công");
+      load();
+    }
   };
 
-  const updateCategory = async (c: Category) => {
+  const updateCategory = async (c: UpdateCategoryRequest) => {
     const res = await categoryApi.update(c);
-    setCategories(prev => prev.map(x => (x.id === c.id ? res : x)));
+    if (res === 0) {
+      notify("error", "Cập nhật thất bại");
+    } else if (res === 404) {
+      notify("error", "Không tìm thấy danh mục");
+    } else if (res === 500) {
+      notify("error", "Lỗi hệ thống");
+    } else if (res === 1) {
+      notify("success", "Cập nhật thái thành công");
+      load();
+    }
   };
 
   const deleteCategory = async (id: number | string) => {
-    await categoryApi.delete(id);
-    setCategories(prev => prev.filter(x => x.id !== id));
+    const res = await categoryApi.delete(id);
+    if (res === 0) {
+      notify("error", "Đổi trạng thái thất bại");
+    } else if (res === 404) {
+      notify("error", "Không tìm thấy danh mục");
+    } else if (res === 500) {
+      notify("error", "Lỗi hệ thống");
+    } else if (res === 1) {
+      notify("success", "Đổi trạng thái thành công");
+      load();
+    }
   };
 
   return (
-    <CategoryContext.Provider value={{ categories, addCategory, updateCategory, deleteCategory }}>
+    <CategoryContext.Provider
+      value={{ categories, addCategory, updateCategory, deleteCategory }}
+    >
       {children}
     </CategoryContext.Provider>
   );
@@ -45,6 +79,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
 export const useCategory = () => {
   const context = useContext(CategoryContext);
-  if (!context) throw new Error('useCategory must be used within CategoryProvider');
+  if (!context)
+    throw new Error("useCategory must be used within CategoryProvider");
   return context;
 };

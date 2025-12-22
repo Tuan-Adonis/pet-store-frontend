@@ -1,4 +1,3 @@
-
 // --- Role ---
 export interface Role {
   id: number | string;
@@ -51,7 +50,7 @@ export interface User {
   roleId: number;
   phone: string;
   status: number; // 1: active, 0: locked
-  
+
   // Frontend Helpers
   name: string;
   addresses?: Address[];
@@ -66,6 +65,7 @@ export interface Category {
   code: string;
   name: string;
   description?: string;
+  status: number;
 }
 
 export interface Breed {
@@ -88,6 +88,7 @@ export interface Origin {
   updatedAt: string;
   updatedBy: string;
   name: string;
+  status: number;
 }
 
 export interface Product {
@@ -139,7 +140,7 @@ export interface OrderItem {
   productId: number | string;
   quantity: number;
   priceSnapshot?: number;
-  
+
   // Frontend Helper
   product?: Product;
 }
@@ -191,7 +192,7 @@ export interface Appointment {
   // Frontend Helpers
   statusHistory?: AppointmentStatusLog[];
   // alias for UI compatibility if needed, or update UI to use appointmentDate
-  date?: string; 
+  date?: string;
   time?: string;
 }
 
