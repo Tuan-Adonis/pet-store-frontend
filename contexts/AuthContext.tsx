@@ -69,9 +69,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const updateProfile = async (updatedUser: User) => {
-    const res = await userApi.update(updatedUser);
-    if (user?.id === res.id) {
-      setUser(res);
+    const res = await authApi.updateProfile(updatedUser);
+    if (res === 0) {
+      notify("error", "Cập nhật thất bại");
+    } else if (res === 404) {
+      notify("error", "Không tìm thấy tài khoản");
+    } else if (res === 500) {
+      notify("error", "Lỗi hệ thống");
+    } else if (res === 1) {
+      notify("success", "Cập nhật thành công");
+      setUser(updatedUser);
     }
   };
 

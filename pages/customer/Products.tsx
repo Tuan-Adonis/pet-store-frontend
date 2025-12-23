@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useProduct } from "../../contexts/ProductContext";
 import { useCart } from "../../contexts/CartContext";
@@ -26,7 +25,7 @@ export const CustomerProducts: React.FC = () => {
   const { breeds: allBreeds } = useBreed();
   const { origins: allOrigins } = useOrigin();
   const { categories: allCategories } = useCategory();
-  
+
   const { user } = useAuth();
   const { formatCurrency } = useLanguage();
   const { notify } = useNotification();
@@ -54,9 +53,11 @@ export const CustomerProducts: React.FC = () => {
   }, [searchParams]);
 
   // Derived filters based on selection (e.g. only show breeds belonging to selected category AND status = 1)
-  const availableBreeds = allBreeds.filter(b => 
-    b.status === 1 &&
-    (category.length === 0 || (b.categoryCode && category.includes(b.categoryCode)))
+  const availableBreeds = allBreeds.filter(
+    (b) =>
+      b.status === 1 &&
+      (category.length === 0 ||
+        (b.categoryCode && category.includes(b.categoryCode)))
   );
 
   const filteredProducts = products.filter((p) => {
@@ -188,22 +189,24 @@ export const CustomerProducts: React.FC = () => {
             <div>
               <h3 className="font-bold text-gray-900 mb-3">Danh mục loài</h3>
               <div className="space-y-2">
-                {allCategories.map((cat) => (
-                  <label
-                    key={cat.id}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={category.includes(cat.code)}
-                      onChange={() => toggleCategory(cat.code)}
-                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <span className="ml-2 text-gray-700 text-sm">
-                      {cat.name}
-                    </span>
-                  </label>
-                ))}
+                {allCategories
+                  .filter((c) => c.status === 1)
+                  .map((cat) => (
+                    <label
+                      key={cat.id}
+                      className="flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={category.includes(cat.code)}
+                        onChange={() => toggleCategory(cat.code)}
+                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="ml-2 text-gray-700 text-sm">
+                        {cat.name}
+                      </span>
+                    </label>
+                  ))}
               </div>
             </div>
 
@@ -211,21 +214,19 @@ export const CustomerProducts: React.FC = () => {
               <h3 className="font-bold text-gray-900 mb-3">Giống</h3>
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                 {availableBreeds.map((b) => (
-                    <label
-                      key={b.id}
-                      className="flex items-center cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={breedFilter.includes(b.name)}
-                        onChange={() => toggleBreed(b.name)}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span className="ml-2 text-gray-700 text-sm">
-                        {b.name}
-                      </span>
-                    </label>
-                  ))}
+                  <label
+                    key={b.id}
+                    className="flex items-center cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={breedFilter.includes(b.name)}
+                      onChange={() => toggleBreed(b.name)}
+                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="ml-2 text-gray-700 text-sm">{b.name}</span>
+                  </label>
+                ))}
                 {availableBreeds.length === 0 && (
                   <span className="text-gray-400 text-xs italic">
                     Chưa có dữ liệu giống cho danh mục này
@@ -237,22 +238,24 @@ export const CustomerProducts: React.FC = () => {
             <div>
               <h3 className="font-bold text-gray-900 mb-3">Nguồn giống</h3>
               <div className="space-y-2">
-                {allOrigins.map((org) => (
-                  <label
-                    key={org.id}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={origin.includes(org.name)}
-                      onChange={() => toggleOrigin(org.name)}
-                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <span className="ml-2 text-gray-700 text-sm">
-                      {org.name}
-                    </span>
-                  </label>
-                ))}
+                {allOrigins
+                  .filter((o) => o.status === 1)
+                  .map((org) => (
+                    <label
+                      key={org.id}
+                      className="flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={origin.includes(org.name)}
+                        onChange={() => toggleOrigin(org.name)}
+                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="ml-2 text-gray-700 text-sm">
+                        {org.name}
+                      </span>
+                    </label>
+                  ))}
               </div>
             </div>
 
@@ -390,7 +393,8 @@ export const CustomerProducts: React.FC = () => {
 
                   <div className="p-5 flex flex-col flex-grow">
                     <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {getCategoryName(product.category || '')} - {product.breed}
+                      {getCategoryName(product.category || "")} -{" "}
+                      {product.breed}
                     </h3>
                     <div className="text-indigo-600 font-medium mb-3">
                       {product.name}
@@ -401,7 +405,7 @@ export const CustomerProducts: React.FC = () => {
                         <Calendar size={12} /> {product.age} tháng
                       </span>
                       <span className="bg-gray-100 px-2 py-1 rounded-md">
-                        {product.gender === 1 ? 'Đực' : 'Cái'}
+                        {product.gender === 1 ? "Đực" : "Cái"}
                       </span>
                     </div>
 

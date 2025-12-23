@@ -125,7 +125,15 @@ export const AdminAttributes: React.FC = () => {
                         b.code}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {b.status === 1 ? "Hoạt động" : "Ngừng"}
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${
+                          b.status === 1
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {b.status === 1 ? "Hoạt động" : "Ngừng"}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
@@ -143,7 +151,15 @@ export const AdminAttributes: React.FC = () => {
                       {o.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {o.status === 1 ? "Hoạt động" : "Ngừng"}
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${
+                          o.status === 1
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {o.status === 1 ? "Hoạt động" : "Ngừng"}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button

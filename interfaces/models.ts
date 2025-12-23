@@ -33,7 +33,7 @@ export interface OrderStatusLog {
   updatedBy: string;
   orderId: number | string;
   status: number;
-  timestamp: string;
+  statusTime: string;
   note?: string;
 }
 
@@ -78,7 +78,7 @@ export interface Breed {
   status: number;
   // Helper
   categoryCode?: string;
-  categoryId?: number | string;
+  categoryId?: number;
 }
 
 export interface Origin {
@@ -92,16 +92,16 @@ export interface Origin {
 }
 
 export interface Product {
-  id: number | string;
+  id: number;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
   updatedBy: string;
   code?: string;
   name: string;
-  categoryId: number | string;
-  breedId?: number | string;
-  originId?: number | string;
+  categoryId: number;
+  breedId: number;
+  originId: number;
   age?: number;
   gender: number; // 1: Đực, 0: Cái
   price: number;
@@ -116,7 +116,7 @@ export interface Product {
 }
 
 export interface Service {
-  id: number | string;
+  id: number;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
@@ -130,14 +130,14 @@ export interface Service {
 
 // --- Cart & Order ---
 export interface CartItem {
-  productId: number | string;
+  productId: number;
   quantity: number;
 }
 
 export interface OrderItem {
-  id: number | string;
-  orderId: number | string;
-  productId: number | string;
+  id: number;
+  orderId: number;
+  productId: number;
   quantity: number;
   priceSnapshot?: number;
 
@@ -146,7 +146,7 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id: number | string;
+  id: number;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
@@ -169,7 +169,7 @@ export interface Order {
 
 // --- Appointment ---
 export interface Appointment {
-  id: number | string;
+  id: number;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
@@ -197,13 +197,13 @@ export interface Appointment {
 }
 
 export interface AppointmentStatusLog {
-  id: number | string;
+  id: number;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
   updatedBy: string;
   appointmentId: number | string;
   status: number;
-  timestamp: string;
+  statusTime: string;
   note?: string;
 }

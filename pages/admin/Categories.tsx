@@ -94,7 +94,15 @@ export const AdminCategories: React.FC = () => {
                   {cat.description}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {cat.status === 1 ? "Hoạt động" : "Ngừng"}
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      cat.status === 1
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {cat.status === 1 ? "Hoạt động" : "Ngừng"}
+                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button

@@ -1,6 +1,3 @@
-
-import { OrderStatus } from "../../enums";
-
 export interface CreateOrderRequest {
   customerId: number | string;
   items: { productId: number | string; quantity: number }[];
@@ -11,8 +8,8 @@ export interface CreateOrderRequest {
 }
 
 export interface UpdateOrderStatusRequest {
-  id: number | string;
-  status: OrderStatus;
+  id: number;
+  status: number;
   note?: string;
-  staffId?: number | string;
+  staffId?: number;
 }

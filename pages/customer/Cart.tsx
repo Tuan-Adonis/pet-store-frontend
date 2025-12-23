@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useCart } from "../../contexts/CartContext";
 import { useProduct } from "../../contexts/ProductContext";
@@ -13,7 +12,9 @@ export const CustomerCart: React.FC = () => {
   const { formatCurrency } = useLanguage();
   const { notify } = useNotification();
   const navigate = useNavigate();
-  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(
+    new Set()
+  );
 
   const cartItems = cart
     .map((item) => ({
@@ -130,9 +131,9 @@ export const CustomerCart: React.FC = () => {
                 </p>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-md text-sm font-bold border border-indigo-100">
+                {/* <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-md text-sm font-bold border border-indigo-100">
                   Số lượng: 1
-                </div>
+                </div> */}
                 <button
                   onClick={() => handleRemove(item.productId)}
                   className="text-gray-400 hover:text-red-500 p-2 transition-colors"
