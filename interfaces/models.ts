@@ -69,7 +69,7 @@ export interface Category {
 }
 
 export interface Breed {
-  id: number | string;
+  id: number;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
@@ -82,7 +82,7 @@ export interface Breed {
 }
 
 export interface Origin {
-  id: number | string;
+  id: number;
   createdAt: string;
   createdBy: string;
   updatedAt: string;

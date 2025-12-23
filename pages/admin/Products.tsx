@@ -72,8 +72,9 @@ export const AdminProducts: React.FC = () => {
       image: "",
       description: "",
       status: 1,
-      breedId: 1,
-      originId: 1,
+      breedId: breeds.filter((b) => b.categoryId === formData.categoryId)[0]
+        ?.id,
+      originId: origins[0]?.id,
       age: 1,
       gender: 1,
     });
@@ -265,6 +266,9 @@ export const AdminProducts: React.FC = () => {
                       setFormData({
                         ...formData,
                         categoryId: Number(e.target.value),
+                        breedId: breeds.filter(
+                          (b) => b.categoryId === Number(e.target.value)
+                        )[0]?.id,
                       })
                     }
                     className="mt-1 w-full border rounded p-2"
