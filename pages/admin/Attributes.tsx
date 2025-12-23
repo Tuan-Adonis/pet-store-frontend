@@ -115,62 +115,74 @@ export const AdminAttributes: React.FC = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {activeTab === "breeds"
-              ? breeds.map((b) => (
-                  <tr key={b.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {b.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {categories.find((c) => c.id === b.categoryId)?.name ||
-                        b.code}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-full ${
-                          b.status === 1
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {b.status === 1 ? "Hoạt động" : "Ngừng"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleDeleteBreed(b.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <ArrowLeftRight size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              : origins.map((o) => (
-                  <tr key={o.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {o.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-full ${
-                          o.status === 1
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {o.status === 1 ? "Hoạt động" : "Ngừng"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleDeleteOrigin(o.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <ArrowLeftRight size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+              ? breeds
+                  .sort(
+                    (a, b) =>
+                      new Date(b.createdAt).getTime() -
+                      new Date(a.createdAt).getTime()
+                  )
+                  .map((b) => (
+                    <tr key={b.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {b.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {categories.find((c) => c.id === b.categoryId)?.name ||
+                          b.code}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-full ${
+                            b.status === 1
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {b.status === 1 ? "Hoạt động" : "Ngừng"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => handleDeleteBreed(b.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <ArrowLeftRight size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+              : origins
+                  .sort(
+                    (a, b) =>
+                      new Date(b.createdAt).getTime() -
+                      new Date(a.createdAt).getTime()
+                  )
+                  .map((o) => (
+                    <tr key={o.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {o.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-full ${
+                            o.status === 1
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {o.status === 1 ? "Hoạt động" : "Ngừng"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => handleDeleteOrigin(o.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <ArrowLeftRight size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
           </tbody>
         </table>
         {((activeTab === "breeds" && breeds.length === 0) ||

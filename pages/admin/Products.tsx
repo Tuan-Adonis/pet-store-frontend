@@ -172,59 +172,65 @@ export const AdminProducts: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((p) => (
-              <tr key={p.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <img
-                    src={p.image}
-                    alt=""
-                    className="h-12 w-12 rounded object-cover bg-gray-100 border"
-                  />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    {p.name}
-                  </div>
-                  <div className="text-sm text-gray-500">{p.category}</div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  <div>{p.breed}</div>
-                  <div>
-                    {p.age} tháng - {p.gender === 1 ? "Đực" : "Cái"}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-bold text-indigo-600">
-                    {formatCurrency(p.price)}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${
-                      p.status === 1
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {p.status === 1 ? "Đang bán" : "Đã bán"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    onClick={() => openEditModal(p)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
-                  >
-                    <Edit size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(p.id)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    <ArrowLeftRight size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {products
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              )
+              .map((p) => (
+                <tr key={p.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img
+                      src={p.image}
+                      alt=""
+                      className="h-12 w-12 rounded object-cover bg-gray-100 border"
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {p.name}
+                    </div>
+                    <div className="text-sm text-gray-500">{p.category}</div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    <div>{p.breed}</div>
+                    <div>
+                      {p.age} tháng - {p.gender === 1 ? "Đực" : "Cái"}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-bold text-indigo-600">
+                      {formatCurrency(p.price)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        p.status === 1
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {p.status === 1 ? "Đang bán" : "Đã bán"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button
+                      onClick={() => openEditModal(p)}
+                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    >
+                      <Edit size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p.id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      <ArrowLeftRight size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
