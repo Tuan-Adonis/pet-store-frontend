@@ -1,4 +1,3 @@
-
 export interface CreateServiceRequest {
   name: string;
   price: number;
@@ -8,5 +7,5 @@ export interface CreateServiceRequest {
 }
 
 export interface UpdateServiceRequest extends Partial<CreateServiceRequest> {
-  id: number | string;
+  id: number;
 }

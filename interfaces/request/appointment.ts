@@ -1,22 +1,20 @@
-
-import { ServiceStatus } from "../../enums";
-
 export interface CreateAppointmentRequest {
-  customerId: number | string;
-  serviceId: number | string;
+  customerId: number;
+  serviceId: number;
   date: string;
   time: string;
   petName: string;
   petSpecies: string;
   petBreed: string;
   petAge: number;
-  paymentMethod: number | string;
+  paymentMethod: number;
   note?: string;
+  isPaid: number;
 }
 
 export interface UpdateAppointmentStatusRequest {
-  id: number | string;
-  status: ServiceStatus;
+  id: number;
+  status: number;
   note?: string;
   staffId?: number | string;
 }

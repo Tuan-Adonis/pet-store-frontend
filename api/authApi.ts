@@ -70,7 +70,7 @@ export const authApi = {
     return res.data;
   },
 
-  updateProfile: async (user: User): Promise<User> => {
+  updateProfile: async (user: User): Promise<number> => {
     const res = await axiosClient.post("/user/update", user);
     return res.data;
   },

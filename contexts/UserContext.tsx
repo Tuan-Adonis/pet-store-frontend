@@ -1,7 +1,6 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '../interfaces';
-import { userApi } from '../api/userApi';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { User } from "../interfaces";
+import { userApi } from "../api/userApi";
 
 interface UserContextType {
   users: User[];
@@ -14,7 +13,9 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,21 +37,30 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addUser = async (newUser: User) => {
     await userApi.create(newUser as any);
-    setUsers(prev => [...prev, newUser]);
+    refreshUsers();
   };
 
   const updateUser = async (updatedUser: User) => {
     await userApi.update(updatedUser);
-    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    refreshUsers();
   };
 
   const deleteUser = async (id: number | string) => {
     await userApi.delete(id);
-    setUsers(prev => prev.filter(u => u.id !== id));
+    refreshUsers();
   };
 
   return (
-    <UserContext.Provider value={{ users, isLoading, addUser, updateUser, deleteUser, refreshUsers }}>
+    <UserContext.Provider
+      value={{
+        users,
+        isLoading,
+        addUser,
+        updateUser,
+        deleteUser,
+        refreshUsers,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
@@ -58,6 +68,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) throw new Error('useUser must be used within UserProvider');
+  if (!context) throw new Error("useUser must be used within UserProvider");
   return context;
 };

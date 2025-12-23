@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAddress } from "../../contexts/AddressContext";
 import { useOrder } from "../../contexts/OrderContext";
@@ -24,13 +24,21 @@ import {
   Lock,
   Save,
 } from "lucide-react";
+import { data } from "react-router-dom";
+import dayjs from "dayjs";
 
 export const CustomerProfile: React.FC = () => {
   const { user, updateProfile } = useAuth();
-  const { userAddresses, addAddress, updateAddress, deleteAddress } =
-    useAddress();
-  const { orders, updateOrderStatus } = useOrder();
-  const { appointments, updateAppointmentStatus } = useAppointment();
+  const {
+    userAddresses,
+    loadAddresses,
+    addAddress,
+    updateAddress,
+    deleteAddress,
+  } = useAddress();
+  const { orders, loadByCustomerID, updateOrderStatus } = useOrder();
+  const { appointments, loadApptByCustomerID, updateAppointmentStatus } =
+    useAppointment();
   const { services } = useService();
   const { t, formatCurrency } = useLanguage();
   const { notify } = useNotification();
@@ -52,6 +60,8 @@ export const CustomerProfile: React.FC = () => {
     phone: "",
   });
 
+  // const [userOrders, setUserOrders] = useState<Order[]>([]);
+
   // Password Form
   const [passwordData, setPasswordData] = useState({
     current: "",
@@ -59,24 +69,18 @@ export const CustomerProfile: React.FC = () => {
     confirm: "",
   });
 
-  const userOrders = orders
-    .filter((o) => o.customerId === user?.id)
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+  useEffect(() => {
+    loadByCustomerID(user?.id);
+    loadApptByCustomerID(user?.id);
+  }, [user]);
 
-  const userAppointments = appointments
-    .filter((a) => a.customerId === user?.id)
-    .sort((a, b) => {
-      const dateA = new Date(
-        `${a.appointmentDate}T${a.appointmentTime}`
-      ).getTime();
-      const dateB = new Date(
-        `${b.appointmentDate}T${b.appointmentTime}`
-      ).getTime();
-      return dateB - dateA;
-    });
+  const userOrders = orders.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  const userAppointments = appointments.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   const getStatusColor = (status: number) => {
     switch (status) {
@@ -119,8 +123,7 @@ export const CustomerProfile: React.FC = () => {
 
   const handleUpdateProfile = () => {
     if (user) {
-      updateProfile({ ...user, name });
-      notify("success", "Cập nhật hồ sơ thành công");
+      updateProfile({ ...user, username });
     }
   };
 
@@ -133,7 +136,7 @@ export const CustomerProfile: React.FC = () => {
       newAddress.info &&
       newAddress.phone
     ) {
-      await addAddress({
+      const addAddre = await addAddress({
         userId: user.id,
         province: newAddress.province,
         district: newAddress.district,
@@ -142,14 +145,16 @@ export const CustomerProfile: React.FC = () => {
         phone: newAddress.phone,
         isDefault: userAddresses.length === 0 ? 1 : 0,
       });
-      setNewAddress({
-        province: "",
-        district: "",
-        ward: "",
-        info: "",
-        phone: "",
-      });
-      notify("success", "Đã thêm địa chỉ mới");
+      if (addAddre === 1) {
+        loadAddresses(user?.id);
+        await setNewAddress({
+          province: "",
+          district: "",
+          ward: "",
+          info: "",
+          phone: "",
+        });
+      }
     } else {
       notify(
         "error",
@@ -158,14 +163,18 @@ export const CustomerProfile: React.FC = () => {
     }
   };
 
-  const handleSetDefaultAddress = async (addr: Address) => {
-    // First, undefault current default
-    const currentDefault = userAddresses.find((a) => a.isDefault === 1);
-    if (currentDefault)
-      await updateAddress({ ...currentDefault, isDefault: 0 });
-    // Set new default
-    await updateAddress({ ...addr, isDefault: 1 });
-    notify("success", "Đã đặt địa chỉ mặc định");
+  const handleSetDefaultAddress = async (addressId: number) => {
+    const updated = await updateAddress(addressId);
+    if (updated === 1) {
+      loadAddresses(user?.id);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId: number) => {
+    const deleted = await deleteAddress(addressId);
+    if (deleted === 1) {
+      loadAddresses(user?.id);
+    }
   };
 
   const handleDirectCancel = (
@@ -187,6 +196,7 @@ export const CustomerProfile: React.FC = () => {
         user?.id
       );
       setSelectedOrder(null);
+      loadByCustomerID(user?.id);
     } else {
       updateAppointmentStatus(
         id,
@@ -195,8 +205,8 @@ export const CustomerProfile: React.FC = () => {
         user?.id
       );
       setSelectedAppointment(null);
+      loadApptByCustomerID(user?.id);
     }
-    notify("success", "Đã hủy thành công");
   };
 
   return (
@@ -326,7 +336,8 @@ export const CustomerProfile: React.FC = () => {
                     </span>
                     <span className="text-sm text-gray-400 mx-2">•</span>
                     <span className="text-sm font-medium">
-                      {appt.appointmentDate} - {appt.appointmentTime}
+                      {dayjs(appt.appointmentDate).format("DD/MM/YYYY")} -{" "}
+                      {appt.appointmentTime}
                     </span>
                   </div>
                   <span
@@ -456,14 +467,14 @@ export const CustomerProfile: React.FC = () => {
                     <div className="flex items-center gap-2">
                       {!addr.isDefault && (
                         <button
-                          onClick={() => handleSetDefaultAddress(addr)}
+                          onClick={() => handleSetDefaultAddress(addr.id)}
                           className="text-indigo-600 hover:text-indigo-800 text-xs underline font-medium"
                         >
                           Đặt làm mặc định
                         </button>
                       )}
                       <button
-                        onClick={() => deleteAddress(addr.id)}
+                        onClick={() => handleDeleteAddress(addr.id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <Trash2 size={16} />
@@ -597,7 +608,7 @@ export const CustomerProfile: React.FC = () => {
                         {getStatusLabel(log.status, "ORDER")}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {new Date(log.timestamp).toLocaleString()}
+                        {new Date(log.statusTime).toLocaleString()}
                       </p>
                       {log.note && (
                         <p className="text-xs italic text-gray-600">
@@ -608,6 +619,115 @@ export const CustomerProfile: React.FC = () => {
                   ))}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modals */}
+      {selectedAppointment && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
+            <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10">
+              <h3 className="font-bold text-lg">{t("common.detail")}</h3>
+              <button onClick={() => setSelectedAppointment(null)}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                <h4 className="font-bold text-sm text-indigo-800 mb-2">
+                  {t("common.pet_info")}
+                </h4>
+                <p className="text-sm">
+                  Bé: {selectedAppointment.petName} (
+                  {selectedAppointment.petSpecies})
+                </p>
+                <p className="text-sm">
+                  Giống: {selectedAppointment.petBreed} -{" "}
+                  {selectedAppointment.petAge} tháng
+                </p>
+              </div>
+
+              <div className="text-sm">
+                <p>
+                  <span className="font-medium">{t("nav.services")}:</span>{" "}
+                  {
+                    services.find((s) => s.id === selectedAppointment.serviceId)
+                      ?.name
+                  }
+                </p>
+                <p>
+                  <span className="font-medium">{t("common.date")}:</span>{" "}
+                  {dayjs(selectedAppointment.appointmentDate).format(
+                    "DD/MM/YYYY"
+                  )}{" "}
+                  - {selectedAppointment.appointmentTime}
+                </p>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-bold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                  <Clock size={16} /> Lịch sử trạng thái
+                </h4>
+                <div className="relative border-l-2 border-gray-200 ml-3 space-y-4 py-1">
+                  {selectedAppointment.statusHistory?.map((log, idx) => (
+                    <div key={idx} className="relative pl-6">
+                      <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-indigo-600 border-2 border-white shadow-sm"></div>
+                      <p className="text-sm font-bold text-gray-800">
+                        {getStatusLabel(log.status, "SERVICE")}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(log.statusTime).toLocaleString()}
+                      </p>
+                      {log.note && (
+                        <p className="text-xs text-gray-600 italic mt-1">
+                          "{log.note}"
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* <div className="pt-4 border-t space-y-3">
+                {selectedAppointment.status === ServiceStatus.PENDING && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => openCancelModal(selectedAppointment.id)}
+                      className="w-full border border-red-300 text-red-600 py-3 rounded-lg text-sm hover:bg-red-50 font-medium"
+                    >
+                      {t("action.cancel_appt")}
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleReceiveAppointment(selectedAppointment.id)
+                      }
+                      className="w-full bg-indigo-600 text-white py-3 rounded-lg text-sm hover:bg-indigo-700 font-bold shadow-md"
+                    >
+                      {t("action.receive_appt")}
+                    </button>
+                  </div>
+                )}
+
+                {selectedAppointment.status === ServiceStatus.IN_PROGRESS &&
+                  selectedAppointment.staffId === user?.id && (
+                    <button
+                      onClick={() =>
+                        handleCompleteAppointment(selectedAppointment.id)
+                      }
+                      className="w-full bg-green-600 text-white py-3 rounded-lg text-sm hover:bg-green-700 font-bold shadow-md"
+                    >
+                      {t("action.process_complete")}
+                    </button>
+                  )}
+
+                {selectedAppointment.status === ServiceStatus.IN_PROGRESS && (
+                  <p className="text-center text-xs text-gray-500 italic">
+                    Dịch vụ đang thực hiện, không thể yêu cầu hủy.
+                  </p>
+                )}
+              </div> */}
             </div>
           </div>
         </div>
